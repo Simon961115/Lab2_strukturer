@@ -179,12 +179,19 @@ public class PriorityQueue<E> {
 
 		if (heap.isEmpty()) return true;
 
-		for (int i = 1; i < heap.size();i++) {
+		if (hash.size() != heap.size()) {return false;}
+
+		for (int i = 0; i < heap.size();i++) {
 			E child = heap.get(i);
 			E parent = heap.get(parent(i));
 
+			if (!(hash.containsKey(child) && hash.get(child) == i)) {return false;}
 			if (comparator.compare(parent,child) > 0) return false;
+
+
 		}
+
+
 		return true;
 	}
 
