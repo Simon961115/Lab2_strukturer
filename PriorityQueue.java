@@ -5,7 +5,7 @@ import java.util.*;
 public class PriorityQueue<E> {
 	public ArrayList<E> heap = new ArrayList<E>();
 	private Comparator<E> comparator;
-	//private Map<E, Integer> hash = new HashMap<>();
+	private Map<E, Integer> hash = new HashMap<>();
 
 	public PriorityQueue(Comparator<E> comparator) {
 		this.comparator = comparator;
@@ -21,7 +21,7 @@ public class PriorityQueue<E> {
 	{
 		assert invariant() : showHeap();
 
-//		hash.put(e,heap.size()-1);
+		hash.put(e,heap.size()-1);
 		heap.add(e);
 
 		siftUp(heap.size()-1);
@@ -49,8 +49,8 @@ public class PriorityQueue<E> {
 			throw new NoSuchElementException();
 
 		//Upddaterar hashmap först.
-//		hash.put(heap.get(heap.size()-1),0);
-//		hash.remove(heap.get(0));
+		hash.put(heap.get(heap.size()-1),0);
+		hash.remove(heap.get(0));
 
 		heap.set(0, heap.get(heap.size()-1));
 		heap.remove(heap.size()-1);
@@ -76,6 +76,7 @@ public class PriorityQueue<E> {
 			//Om child är mindre än parent, byt plats
 			if (comparator.compare(parentValue,value) > 0) {
 
+				hash.put(parentValue,index);
 				heap.set(index, parentValue);
 			}
 
@@ -83,6 +84,8 @@ public class PriorityQueue<E> {
 
 			index = parentIndex;
 		}
+
+		hash.put(value,index);
 		heap.set(index, value);
 
 
@@ -93,13 +96,26 @@ public class PriorityQueue<E> {
 
 		assert invariant() : showHeap();
 
-		for (int i = 0; i<heap.size();i++) {
-			if (heap.get(i).equals(oldBid)) {
-				heap.set(i,newBid);
-				if (comparator.compare(oldBid,newBid) > 0) {siftUp(i);}
-				else if (comparator.compare(oldBid,newBid) < 0) {siftDown(i);}
-			}
+//		for (int i = 0; i<heap.size();i++) {
+//			if (heap.get(i).equals(oldBid)) {
+//				heap.set(i,newBid);
+//				if (comparator.compare(oldBid,newBid) > 0) {siftUp(i);}
+//				else if (comparator.compare(oldBid,newBid) < 0) {siftDown(i);}
+//			}
+//		}
+
+		if (hash.containsKey(oldBid)) {
+
+			int i = hash.get(oldBid);
+			heap.set(i,newBid);
+			hash.put(newBid,i);
+			hash.remove(oldBid);
+			if (comparator.compare(oldBid,newBid) > 0) {siftUp(i);}
+			else if (comparator.compare(oldBid,newBid) < 0) {siftDown(i);}
+
 		}
+
+
 
 		assert invariant() : showHeap();
 	}
@@ -135,11 +151,13 @@ public class PriorityQueue<E> {
 			// carry on downwards.
 			if (comparator.compare(value, childValue) > 0) {
 
+				hash.put(childValue,index);
 				heap.set(index, childValue);
 				index = child;
 			} else break;
 		}
 
+		hash.put(value,index);
 		heap.set(index, value);
 	}
 
