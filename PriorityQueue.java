@@ -5,6 +5,8 @@ import java.util.*;
 public class PriorityQueue<E> {
 	public ArrayList<E> heap = new ArrayList<E>();
 	private Comparator<E> comparator;
+
+	// hash innehåller E som nyckel och en integer som representerar det index som E finns på i heapen
 	private Map<E, Integer> hash = new HashMap<>();
 
 	public PriorityQueue(Comparator<E> comparator) {
@@ -17,6 +19,7 @@ public class PriorityQueue<E> {
 	}
      
 	// Adds an item to the priority queue.
+	//Time complexity : O(log n)
 	public void add(E e)
 	{
 		assert invariant() : showHeap();
@@ -40,8 +43,8 @@ public class PriorityQueue<E> {
 
 	// Removes the smallest item in the priority queue.
 	// Throws NoSuchElementException if empty.
+	//Time complexity : O()
 	public void deleteMinimum() {
-
 
 		assert invariant() : showHeap();
 
@@ -64,16 +67,20 @@ public class PriorityQueue<E> {
 	// Sifts a node up.
 	// siftUp(index) fixes the invariant if the element at 'index' may
 	// be less than its parent, but all other elements are correct.
+	// Time complexity : O(log n)
 	private void siftUp(int index) {
 
+		// value representerar det aktuella budet som ska siftas
 		E value = heap.get(index);
 
 		while (index != 0) {
 
+			//index för föräldern
 			int parentIndex = parent(index);
+			//budet som finns i föräldern
 			E parentValue = heap.get(parentIndex);
 
-			//Om child är mindre än parent, byt plats
+			//Om child har högre prio än sin förälder, byt plats
 			if (comparator.compare(parentValue,value) > 0) {
 
 				hash.put(parentValue,index);
@@ -92,30 +99,27 @@ public class PriorityQueue<E> {
 
 	}
 
+	// Update tar emot en kopia av ett gammalt bud och ett nytt bud och byter ut det gamla budet mot det
+	//nya
+	//Time complexity : O(log n)(I värsta fall givet att budet ändras så att det behöver
+	// siftas genom hela heapen)
 	public void update(E oldBid, E newBid) {
 
 		assert invariant() : showHeap();
 
-//		for (int i = 0; i<heap.size();i++) {
-//			if (heap.get(i).equals(oldBid)) {
-//				heap.set(i,newBid);
-//				if (comparator.compare(oldBid,newBid) > 0) {siftUp(i);}
-//				else if (comparator.compare(oldBid,newBid) < 0) {siftDown(i);}
-//			}
-//		}
-
 		if (hash.containsKey(oldBid)) {
-
+			// Använder sig av heapen för att få fram rätt index till oldBid
 			int i = hash.get(oldBid);
 			heap.set(i,newBid);
 			hash.put(newBid,i);
 			hash.remove(oldBid);
+			// Om newBid har högre prioritet än oldBid måste newBid siftas uppåt
 			if (comparator.compare(oldBid,newBid) > 0) {siftUp(i);}
+			// Om newBid har lägre prioritet än oldBid måste newBid siftas nedåt
 			else if (comparator.compare(oldBid,newBid) < 0) {siftDown(i);}
 
 		}
-
-
+		else throw new UnsupportedOperationException();
 
 		assert invariant() : showHeap();
 	}
@@ -124,6 +128,7 @@ public class PriorityQueue<E> {
 	// Sifts a node down.
 	// siftDown(index) fixes the invariant if the element at 'index' may
 	// be greater than its children, but all other elements are correct.
+	// Time complexity : O(log n)
 	private void siftDown(int index) {
 		E value = heap.get(index);
 		
@@ -146,7 +151,6 @@ public class PriorityQueue<E> {
 					childValue = rightValue;
 				}
 			}
-
 			// If the child is smaller than the parent,
 			// carry on downwards.
 			if (comparator.compare(value, childValue) > 0) {
@@ -175,27 +179,33 @@ public class PriorityQueue<E> {
 	}
 
 
+	// Kollar att invarianten upprätthålls, dvs att varje barn i heapen är större/ mindre än sin
+	//förälder beroende på comparator samt att alla index i hash överensstämmer med heapen.
+	// Time complexity : O(n)
+
 	private boolean invariant () {
 
 		if (heap.isEmpty()) return true;
 
+		// Om hash och heap inte är lika stora så är invarianten bruten.
 		if (hash.size() != heap.size()) {return false;}
 
 		for (int i = 0; i < heap.size();i++) {
 			E child = heap.get(i);
 			E parent = heap.get(parent(i));
 
+			// Kollar så att hash innehåller det aktuella budet och att dess värde är samma som indexet i heap,
+			// om inte är invarianten bruten
 			if (!(hash.containsKey(child) && hash.get(child) == i)) {return false;}
+			//Om child/ parent inte uppfyller comparators jämförelse så är invarianten bruten.
 			if (comparator.compare(parent,child) > 0) return false;
-
-
 		}
-
-
 		return true;
 	}
 
-	public String showHeap() {
+	// Retunerar en string med beskrivning av samtliga element i heapen
+	// Time complexity : O(n)
+	private String showHeap() {
 		StringBuilder sb = new StringBuilder();
 
 		for (E e : heap) {

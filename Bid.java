@@ -18,8 +18,8 @@ public class Bid {
 	@Override
 	public boolean equals(Object obj){
 		if (obj == null || !(obj instanceof Bid)) return false;
-		Bid bid = (Bid) obj;
 
+		Bid bid = (Bid) obj;
 		if (hashCode() == bid.hashCode()) {return true;}
 		return false;
 
@@ -27,10 +27,7 @@ public class Bid {
 
 	@Override
 	public String toString(){
-		Integer bidInteger = bid;
-		String bidString = bidInteger.toString();
-
-		return name+" "+bidString+" ";
+		return name+" "+bid+" ";
 	}
 
 }

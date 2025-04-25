@@ -30,8 +30,10 @@ public class Lab2 {
 			}
 
 			if( action.equals("K") ) {
+				//Skapar nytt bud och lägger till det i köp- heapen
 				buy_pq.add(new Bid(name,price));
 			} else if( action.equals("S") ) {
+				//Skapar nytt bud och lägger till det i sälj- heapen
 				sell_pq.add(new Bid(name,price));
 			} else if( action.equals("NK") ) {
                 int newPrice;
@@ -42,6 +44,8 @@ public class Lab2 {
                             "line " + line_no + ": invalid price");
                 }
 
+				//Skapar en kopia av det gamla budet som ska uppdateras
+				// och ett nytt bud som ska ersätta det gamla
                 buy_pq.update(new Bid(name, price), new Bid(name, newPrice));
             } else if( action.equals("NS") ){
 				int newPrice;
@@ -52,6 +56,8 @@ public class Lab2 {
 							"line " + line_no + ": invalid price");
 				}
 
+				//Skapar en kopia av det gamla budet som ska uppdateras
+				// och ett nytt bud som ska ersätta det gamla
 				sell_pq.update(new Bid(name, price), new Bid(name, newPrice));
 
 			} else {
@@ -62,6 +68,7 @@ public class Lab2 {
 			if( sell_pq.size() == 0 || buy_pq.size() == 0 )continue;
 
 
+			// Genomför transaktion om lägsta säljarbud är mindre än eller lika med högsta köpbud
 			else if (sell_pq.minimum().getBid() <= buy_pq.minimum().getBid()) {
 				String transaction = buy_pq.minimum().getName()+" buys a share from "+sell_pq.minimum().getName() +" for "+sell_pq.minimum().getBid()+" kr\n";
 				sb.append(transaction);
